@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexRepute AI — Local Business Reputation & SEO Agent</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons & Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Top Announcement Bar -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+          <i class="ph-bold ph-shield-star text-2xl"></i>
+        </div>
+        <div>
+          <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">ApexRepute AI</span>
+          <span class="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">Local SEO & Review Agent</span>
+        </div>
+      </div>
+
+      <!-- Client Switcher & Actions -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700">
+          <i class="ph-fill ph-storefront text-slate-400 ml-2"></i>
+          <select id="businessSelector" onchange="onBusinessChange(this.value)" class="bg-transparent text-sm text-slate-200 font-medium px-2 py-1 outline-none cursor-pointer">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <button onclick="triggerSyncReviews()" id="syncBtn" class="flex items-center gap-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-2 rounded-lg transition-all shadow-sm">
+          <i class="ph-bold ph-arrows-clockwise text-sm"></i>
+          <span class="hidden md:inline">Sync Reviews</span>
+        </button>
+
+        <button onclick="triggerWeeklyReport()" id="reportBtn" class="flex items-center gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-lg transition-all shadow-sm">
+          <i class="ph-bold ph-envelope-simple text-sm"></i>
+          <span class="hidden md:inline">Send Weekly Digest</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Business Sub-Bar -->
+  <section class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div>
+          <h1 id="bizTitle" class="text-xl font-bold text-slate-900">Dr. Smile Family Dentistry</h1>
+          <p id="bizSubtitle" class="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+            <span id="bizCategory">Dentist & Orthodontics</span> &bull; 
+            <span id="bizLocation"><i class="ph ph-map-pin"></i> Austin, TX</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+        <button onclick="switchTab('reviews')" id="tab-reviews" class="tab-btn px-3 py-1.5 rounded-lg bg-white text-blue-600 shadow-sm transition">
+          Reviews & AI Replies
+        </button>
+        <button onclick="switchTab('seo')" id="tab-seo" class="tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">
+          Local SEO Tracker
+        </button>
+        <button onclick="switchTab('reports')" id="tab-reports" class="tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">
+          Weekly Reports
+        </button>
+        <button onclick="switchTab('audit')" id="tab-audit" class="tab-btn px-3 py-1.5 rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/60 transition flex items-center gap-1">
+          <i class="ph-bold ph-rocket-launch"></i> Phase 4 Acquisition Tool
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      <!-- KPI 1: Rating -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold">
+          <span>Overall Rating</span>
+          <i class="ph-fill ph-star text-amber-400 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiRating" class="text-2xl font-extrabold text-slate-900">4.8</span>
+          <span class="text-xs text-emerald-600 font-semibold flex items-center"><i class="ph-bold ph-arrow-up-right"></i> +0.3</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1">Google & Yelp composite</p>
+      </div>
+
+      <!-- KPI 2: Total Reviews -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold">
+          <span>Total Reviews</span>
+          <i class="ph ph-chat-centered-text text-blue-500 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiTotalReviews" class="text-2xl font-extrabold text-slate-900">42</span>
+          <span class="text-xs text-emerald-600 font-semibold">+3 this wk</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1">Review velocity healthy</p>
+      </div>
+
+      <!-- KPI 3: Pending Approvals -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold">
+          <span>Pending AI Replies</span>
+          <i class="ph-bold ph-clock-countdown text-amber-500 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiPendingReplies" class="text-2xl font-extrabold text-amber-600">2</span>
+          <span class="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-bold">Needs Action</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1">Under 24h target</p>
+      </div>
+
+      <!-- KPI 4: Net Sentiment -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold">
+          <span>Net Sentiment</span>
+          <i class="ph ph-heart text-rose-500 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiSentiment" class="text-2xl font-extrabold text-slate-900">92%</span>
+          <span class="text-xs text-emerald-600 font-semibold font-bold">Positive</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1">AI sentiment scan</p>
+      </div>
+
+      <!-- KPI 5: Map Pack Keywords -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between col-span-2 md:col-span-1">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold">
+          <span>Map Pack #1-3</span>
+          <i class="ph-bold ph-map-trifold text-indigo-500 text-base"></i>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpiMapPack" class="text-2xl font-extrabold text-indigo-600">3 / 5</span>
+          <span class="text-xs text-slate-500 font-medium">Keywords</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1">Google Maps Local 3-Pack</p>
+      </div>
+    </div>
+
+    <!-- TAB 1: REVIEWS & AI REPLIES -->
+    <div id="view-reviews" class="tab-view block space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Customer Reviews & AI Response Engine</h2>
+          <p class="text-xs text-slate-500">Auto-drafts empathetic, brand-aligned responses integrating your local SEO keywords.</p>
+        </div>
+        
+        <!-- Filter pills -->
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-400 font-medium mr-1">Filter:</span>
+          <button onclick="filterReviews('all')" id="filter-all" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900 text-white">All</button>
+          <button onclick="filterReviews('pending')" id="filter-pending" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300">Pending Approval</button>
+          <button onclick="filterReviews('negative')" id="filter-negative" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-100 text-rose-700 hover:bg-rose-200">Negative / Urgent</button>
+        </div>
+      </div>
+
+      <!-- Reviews Feed List -->
+      <div id="reviewsContainer" class="space-y-4">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </div>
+
+    <!-- TAB 2: LOCAL SEO TRACKER -->
+    <div id="view-seo" class="tab-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Local SEO & Google Maps 3-Pack Tracker</h2>
+          <p class="text-xs text-slate-500">Track ranking movements and local pack visibility for your highest-intent business search terms.</p>
+        </div>
+        <button onclick="promptAddKeyword()" class="flex items-center gap-1.5 text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-lg transition">
+          <i class="ph-bold ph-plus"></i> Add Target Keyword
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="py-3.5 px-6">Tracked Keyword</th>
+              <th class="py-3.5 px-4">Current Rank</th>
+              <th class="py-3.5 px-4">Rank Movement</th>
+              <th class="py-3.5 px-4">Monthly Volume</th>
+              <th class="py-3.5 px-4">Local 3-Pack Status</th>
+              <th class="py-3.5 px-6 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="seoKeywordsTable" class="divide-y divide-slate-100 text-slate-700">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: WEEKLY REPORTS -->
+    <div id="view-reports" class="tab-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Automated Weekly Impact Digests</h2>
+          <p class="text-xs text-slate-500">Weekly summaries dispatched to client inbox every Monday via Resend email automation.</p>
+        </div>
+        <button onclick="triggerWeeklyReport()" class="flex items-center gap-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-2 rounded-lg transition shadow-sm">
+          <i class="ph-bold ph-paper-plane-tilt"></i> Generate & Dispatch Now
+        </button>
+      </div>
+
+      <div id="reportsContainer" class="space-y-4">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- TAB 4: PHASE 4 ACQUISITION ENGINE -->
+    <div id="view-audit" class="tab-view hidden space-y-6">
+      <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-100/50 p-6 rounded-2xl border border-amber-200">
+        <div class="max-w-3xl">
+          <div class="flex items-center gap-2 text-amber-800 text-xs font-extrabold uppercase tracking-wider mb-1">
+            <i class="ph-fill ph-fire text-amber-500 text-base"></i> Phase 4: Zero-Cost Client Acquisition Engine
+          </div>
+          <h2 class="text-xl font-black text-slate-900">Generate GBP Audit, Missed Revenue Report & Cold Pitch</h2>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+            Target local businesses (dentists, cafes, HVAC, contractors) with mediocre ratings or missed reviews. 
+            Enter their public info below to instantly generate a mathematical revenue leak calculation, a personalized cold email, and a 60-second Loom screen recording script!
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Business Name</label>
+            <input id="auditName" type="text" value="Apex Smile Dental" placeholder="e.g. Apex Dental Care" class="w-full text-xs font-medium px-3 py-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Category & City</label>
+            <input id="auditCategoryCity" type="text" value="Dental Clinic, Dallas TX" placeholder="e.g. Cafe, Chicago IL" class="w-full text-xs font-medium px-3 py-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Current Rating / Unreplied Reviews</label>
+            <div class="flex gap-2">
+              <input id="auditRating" type="number" step="0.1" value="4.1" placeholder="4.1" class="w-1/2 text-xs font-medium px-3 py-2 bg-white rounded-lg border border-slate-300">
+              <input id="auditUnreplied" type="number" value="12" placeholder="12" class="w-1/2 text-xs font-medium px-3 py-2 bg-white rounded-lg border border-slate-300">
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-between">
+          <div class="text-[11px] text-slate-500">
+            Average customer value assumed: <span class="font-bold text-slate-700">$350</span>
+          </div>
+          <button onclick="runAuditGenerator()" id="generateAuditBtn" class="flex items-center gap-2 text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white px-5 py-2.5 rounded-xl shadow-md transition">
+            <i class="ph-bold ph-lightning"></i> Run Instant Audit & Generate Pitch
+          </button>
+        </div>
+      </div>
+
+      <!-- Audit Results Box -->
+      <div id="auditResultsSection" class="hidden space-y-6">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Report Preview Modal -->
+  <div id="reportModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+          <i class="ph-bold ph-envelope text-blue-600"></i> Client Email Digest Preview
+        </h3>
+        <button onclick="closeReportModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="ph-bold ph-x text-lg"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto flex-1" id="reportModalBody">
+        <!-- Injected HTML -->
+      </div>
+      <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeReportModal()" class="text-xs font-semibold px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden transition-all duration-300 transform translate-y-4">
+    <div class="bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border border-slate-700" id="toastContent">
+      <i class="ph-bold ph-check-circle text-emerald-400 text-base"></i>
+      <span id="toastMsg">Action completed!</span>
+    </div>
+  </div>
+
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>
+        <span class="font-bold text-slate-700">ApexRepute AI</span> &bull; Zero-Cost Local Reputation & SEO Agent
+      </div>
+      <div class="text-[11px] text-slate-500">
+        Multi-tenant ready &bull; FastAPI + Free Tier AI Engine &bull; Ready to deploy on Vercel or Render
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
